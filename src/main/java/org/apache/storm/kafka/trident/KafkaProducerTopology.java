@@ -31,7 +31,12 @@ import org.apache.storm.LocalCluster;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+/**
+ * KafkaProducerTopology 可独立运行 <br>
+ * 首先启动zookeeper 和kafka server
+ *
+ * @author zyt
+ */
 public class KafkaProducerTopology {
 
     protected static final Logger LOG = LoggerFactory.getLogger(KafkaProducerTopology.class);
@@ -84,27 +89,10 @@ public class KafkaProducerTopology {
         String brokerUrl = "zythome:9092";
 
         LocalCluster cluster = new LocalCluster();
-        cluster.submitTopology("wordCounter", defaultConfig(true), newTopology(brokerUrl, "test"));        
+        cluster.submitTopology("wordCounter",  new Config(), newTopology(brokerUrl, "test"));        
         Thread.sleep(60 * 1000 * 10);
         cluster.killTopology("wordCounter");
         cluster.shutdown();
 
     }
-
-    public static Config defaultConfig(boolean debug) {
-        Config conf = new Config();
-        conf.setMaxSpoutPending(10);//设置spout task上面最多有多少个没有处理(ack/fail)的tuple，防止tuple队列过大,只对可靠任务起作用
-        conf.setDebug(debug);
-        conf.setNumWorkers(2); // 设置工作进程,如果不添加,认会是4个worker进程
-        conf.setMaxTaskParallelism(5);
-        //以下也不用配
-        /*
-        conf.put(Config.NIMBUS_SEEDS, Arrays.asList(dockerIp));
-        conf.put(Config.NIMBUS_THRIFT_PORT, 6627);
-        conf.put(Config.STORM_ZOOKEEPER_PORT, 2181);
-        conf.put(Config.STORM_ZOOKEEPER_SERVERS, Arrays.asList(dockerIp));
-         */
-        return conf;
-    }
-
 }

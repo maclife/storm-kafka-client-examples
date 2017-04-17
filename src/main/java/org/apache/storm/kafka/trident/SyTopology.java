@@ -40,13 +40,19 @@ public class SyTopology {
         brokerHosts = new ZkHosts(kafkaZookeeper);
     }
 
+    /**
+     * OpaqueTridentKafkaSpout <br>
+     * http://blog.sina.com.cn/s/blog_6ff05a2c0101jn1b.html
+     *
+     * @return
+     */
     public StormTopology buildTopology() {
         //定义kafka想着配置
         TridentKafkaConfig kafkaConfig = new TridentKafkaConfig(brokerHosts, "test");
         kafkaConfig.scheme = new SchemeAsMultiScheme(new StringScheme());
         // TransactionalTridentKafkaSpout kafkaSpout = new TransactionalTridentKafkaSpout(kafkaConfig);  
         OpaqueTridentKafkaSpout kafkaSpout = new OpaqueTridentKafkaSpout(kafkaConfig);
-        
+
         TridentTopology topology = new TridentTopology();
         //从kafka中读取消息并处理
         topology.newStream("kafka", kafkaSpout)

@@ -40,6 +40,8 @@ import org.slf4j.LoggerFactory;
  * 参考 <br>
  * http://www.flyne.org/article/216 <br>
  * http://brandnewuser.iteye.com/blog/2309970 <br>
+ * http://blog.csdn.net/derekjiang/article/details/9126185<;br>
+ * http://www.cnblogs.com/hseagle/p/3516458.html<;br>
  *
  * @author zyt
  */
@@ -74,7 +76,7 @@ public class TridentKafkaConsumerTopology {
 
     private static Stream addDRPCStream(TridentTopology tridentTopology, final TridentState state, LocalDRPC drpc) {
         LOG.info("TridentKafkaConsumerTopology.addDRPCStream");
-        return tridentTopology.newDRPCStream("words", drpc)
+        return tridentTopology.newDRPCStream("words", drpc)//if(server==null)spout = new DRPCSpout(function);
                 .each(new Fields("args"), new Split(), new Fields("word"))
                 .groupBy(new Fields("word"))
                 .stateQuery(state, new Fields("word"), new MapGet(), new Fields("count"))
@@ -115,4 +117,7 @@ public class TridentKafkaConsumerTopology {
         //这个例子当中,一个group好的stream,Trident会期待你提供的state是实现了MapState接口(DebugMemoryMapState.Factory())
         //用来进行group的字段会以key的形式存在于State当中,聚合后的结果会以value的形式存储在State当中
     }
+    
+    
+    
 }

@@ -41,9 +41,9 @@ import static org.apache.storm.kafka.spout.KafkaSpoutConfig.FirstPollOffsetStrat
 
 public class TridentKafkaClientWordCountNamedTopics {
 
-    private static final String TOPIC_1 = "test-trident";
+    private static final String TOPIC_1 = "test";
     private static final String TOPIC_2 = "test-trident-1";
-    private static final String KAFKA_LOCAL_BROKER = "localhost:9092";
+    private static final String KAFKA_LOCAL_BROKER = "zythome:9092";
 
     /**
      * 使用OpaqueTridentKafkaSpout时,默认的输出名称为bytes,其输出格式也并不是String字符串而是byte[], 需要根据编码格式将其转换为String
@@ -54,7 +54,7 @@ public class TridentKafkaClientWordCountNamedTopics {
         return new KafkaTridentSpoutOpaque<>(newKafkaSpoutConfig());
     }
 
-    private static Func<ConsumerRecord<String, String>, List<Object>> JUST_VALUE_FUNC = new JustValueFunc();
+    private static  Func<ConsumerRecord<String, String>, List<Object>> JUST_VALUE_FUNC = new JustValueFunc();
 
     /**
      * Needs to be serializable

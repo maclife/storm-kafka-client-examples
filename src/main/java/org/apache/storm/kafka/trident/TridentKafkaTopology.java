@@ -30,6 +30,12 @@ import org.apache.storm.tuple.Values;
 
 import java.util.Properties;
 
+/**
+ * TridentKafkaTopology 可独立运行 <br>
+ * 首先启动zookeeper 和kafka server
+ *
+ * @author zyt
+ */
 public class TridentKafkaTopology {
 
     private static StormTopology buildTopology(String brokerConnectionString) {

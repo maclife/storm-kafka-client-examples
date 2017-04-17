@@ -31,21 +31,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TridentKafkaClientWordCountWildcardTopics extends TridentKafkaClientWordCountNamedTopics {
-    
     protected static final Logger LOG = LoggerFactory.getLogger(TridentKafkaClientWordCountWildcardTopics.class);
-    private static final Pattern TOPIC_WILDCARD_PATTERN = Pattern.compile("test-trident(-1)?");
     
-    private static Func<ConsumerRecord<String, String>, List<Object>> JUST_VALUE_FUNC = new Func<ConsumerRecord<String, String>, List<Object>>() {
+    private static final Pattern TOPIC_WILDCARD_PATTERN = Pattern.compile("test");//test-trident(-1)?    
+    private static final String KAFKA_LOCAL_BROKER = "zythome:9092";
+    private static final Func<ConsumerRecord<String, String>, List<Object>> JUST_VALUE_FUNC = new Func<ConsumerRecord<String, String>, List<Object>>() {
         @Override
         public List<Object> apply(ConsumerRecord<String, String> record) {
             LOG.info("ConsumerRecord:{}", record.value());
             return new Values(record.value());
         }
     };
-    
+
     @Override
     protected KafkaSpoutConfig<String, String> newKafkaSpoutConfig() {
-        return KafkaSpoutConfig.builder("127.0.0.1:9092", TOPIC_WILDCARD_PATTERN)
+        return KafkaSpoutConfig.builder(KAFKA_LOCAL_BROKER, TOPIC_WILDCARD_PATTERN)
                 .setGroupId("kafkaSpoutTestGroup")
                 .setMaxPartitionFectchBytes(200)
                 .setRecordTranslator(JUST_VALUE_FUNC, new Fields("str"))
@@ -55,8 +55,8 @@ public class TridentKafkaClientWordCountWildcardTopics extends TridentKafkaClien
                 .setMaxUncommittedOffsets(250)
                 .build();
     }
-    
-    public static void main(String[] args) throws Exception {        
+
+    public static void main(String[] args) throws Exception {
         new TridentKafkaClientWordCountWildcardTopics().run(args);
     }
 }

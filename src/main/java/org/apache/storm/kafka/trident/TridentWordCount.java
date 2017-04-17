@@ -24,6 +24,12 @@ import org.apache.storm.trident.tuple.TridentTuple;
 import org.apache.storm.tuple.Fields;
 import org.apache.storm.tuple.Values;
 
+/**
+ * TridentWordCount 可独立运行 <br>
+ * 在内建的集群中运行,将结果保存于内存,不依赖外部环境
+ *
+ * @author zyt
+ */
 public class TridentWordCount {
 
     public static class Split extends BaseFunction {
