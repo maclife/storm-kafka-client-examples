@@ -40,8 +40,11 @@ import org.slf4j.LoggerFactory;
  * 参考 <br>
  * http://www.flyne.org/article/216 <br>
  * http://brandnewuser.iteye.com/blog/2309970 <br>
- * http://blog.csdn.net/derekjiang/article/details/9126185<;br>
- * http://www.cnblogs.com/hseagle/p/3516458.html<;br>
+ * http://blog.csdn.net/derekjiang/article/details/9126185<br>
+ * http://www.cnblogs.com/hseagle/p/3516458.html<br>
+ * 
+ * StormTopology TridentTopology的区别
+ * See http://www.tianshouzhi.com/api/tutorials/storm/56
  *
  * @author zyt
  */
