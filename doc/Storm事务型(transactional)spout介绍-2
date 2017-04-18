@@ -1,0 +1,38 @@
+
+接下来再介绍一下IOpaquePartitionedTransactionalSpout。前面说到IPartitionedTransactionalSpout在极罕见的情况下会卡住。而IOpaquePartitionedTransactionalSpout为了解决这个问题，它不保证每次重发一个批次的消息所包含的tuple完全一致。也就是说某个tuple可能第一次在txid=2的批次中出现，后面有可能在txid=5的批次中出现。这种情况只出现在当某一批次消息消费失败需要重发且恰巧消息中间件故障时。这时，IOpaquePartitionedTransactionalSpout不是等待消息中间件故障恢复，而是先读取可读的partition。例如txid=2的批次在消费过程中失败了，需要重发，恰巧消息中间件的16个分区有1个分区(partition=3)因为故障不可读了。这时候IOpaquePartitionedTransactionalSpout会先读另外的15个分区，完成txid=2这个批次的发送，这时候同样的批次其实包含的tuple已经少了。假设在txid=5时消息中间件的故障恢复了，那之前在txid=2且在分区partition=3的tuple会重新发送，包含在txid=5的批次中。
+在使用IOpaquePartitionedTransactionalSpout时，因为tuple与txid的对应关系有可能改变，因此与业务计算结果同时保存一个txid就无法保证事务性了。这时候解决方案会稍微复杂一些，除了保存业务计算结果以外，还要保存两个元素：前一批次的业务计算结果以及本批次的事务ID。
+我们以一个更简单的计算全局count的例子作说明，假设目前的统计结果为：
+{ value = 4,
+  prevValue = 1,
+  txid = 2
+}
+新的一批次txid=3的增量count是2
+可以保证完整事务性的计算应该是：检查新批次的txid与已保存的txid，如果两个txid相同，说明此批次消息已经来过。但是由于IOpaquePartitionedTransactionalSpout不保证同批次消息重发后所包含的tuple和之前一致，因此这时候要重新计算这批次的值，即value = preValue + 新发来的增量。如果两个txid不相同，说明此批次消息不是重发的消息，那么value = value + 新发来的增量。
+根据这个计算逻辑，新计算后的结果应该为：
+{ value = 6,
+  prevValue = 4,
+  txid = 3
+}
+但是假设新的一批次的txid不是3而是2，增量count同样为2，那么新计算后的结果应该为：
+{ value = 3,
+  prevValue = 1,
+  txid = 2
+}
+IOpaquePartitionedTransactionalSpout接口同样有两个嵌套类：
+IOpaquePartitionedTransactionalSpout.Coordinator
+IOpaquePartitionedTransactionalSpout.Emitter <X>
+相比IPartitionedTransactionalSpout，IOpaquePartitionedTransactionalSpout.Emitter <X>类的emit方法从2个变成了1个：
+X emitPartitionBatch(TransactionAttempt tx,
+                     BatchOutputCollector collector,
+                     int partition,
+                     X lastPartitionMeta)
+它不区分发新消息还是重发旧消息，全部用emitPartitionBatch搞定。虽然emitPartitionBatch返回的X应该是下一批次供自己使用的（emitPartitionBatch的第4个参数），但是只有一个批次成功以后X才会更新到ZooKeeper中，如果失败重发，emitPartitionBatch读取的X还是旧的。所以这时候自定义的X不需要记录当前批次的开始偏移量和下一批次的开始偏移量两个值，只需要记录下一批次开始偏移量一个值即可，例如：
+public class BatchMeta { 
+    public long  nextOffset; //下一批次的偏移量    
+}
+ 
+最后简单做一个总结：
+IPartitionedTransactionalSpout提供了一种最简单的处理事务型应用的方法，持久化存储中要额外保存txid，它可能会出现spout卡住的问题。
+IOpaquePartitionedTransactionalSpout是最严谨的处理事务型应用的方法，但是使用它编写应用代码会更复杂一些，持久化存储中除了要额外保存txid之外，还要保存前一批次的业务计算结果。
+本文参考：
+https://github.com/nathanmarz/storm/wiki/Trident-state
