@@ -83,7 +83,7 @@ public class TridentKafkaTopology {
     public static void main(String[] args) throws Exception {
         System.out.println("Please provide kafka broker url ,e.g. localhost:9092");
 
-        String brokerUrl = args.length >= 1 ? args[0] : "zytwork:9092";
+        String brokerUrl = args.length >= 1 ? args[0] : "zythome:9092";
 
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("wordCounter", new Config(), buildTopology(brokerUrl));

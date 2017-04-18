@@ -34,7 +34,7 @@ public class TridentKafkaClientWordCountWildcardTopics extends TridentKafkaClien
     protected static final Logger LOG = LoggerFactory.getLogger(TridentKafkaClientWordCountWildcardTopics.class);
     
     private static final Pattern TOPIC_WILDCARD_PATTERN = Pattern.compile("test");//test-trident(-1)?    
-    private static final String KAFKA_LOCAL_BROKER = "zytwork:9092";
+    private static final String KAFKA_LOCAL_BROKER = "zythome:9092";
     private static final Func<ConsumerRecord<String, String>, List<Object>> JUST_VALUE_FUNC = new Func<ConsumerRecord<String, String>, List<Object>>() {
         @Override
         public List<Object> apply(ConsumerRecord<String, String> record) {

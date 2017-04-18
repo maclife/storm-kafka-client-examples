@@ -64,11 +64,11 @@ public class SyTopology {
     }
 
     public static void main(String[] args) throws AlreadyAliveException, InvalidTopologyException, AuthorizationException, InterruptedException {
-        SyTopology topology = new SyTopology("zytwork:9092");
+        SyTopology topology = new SyTopology("zythome:9092");
         Config config = new Config();
         config.put(Config.TOPOLOGY_TRIDENT_BATCH_EMIT_INTERVAL_MILLIS, 2000);
 
-        String dockerIp = "zytwork";
+        String dockerIp = "zythome";
         config.setNumWorkers(9);
         config.setMaxTaskParallelism(5);
         config.put(Config.STORM_ZOOKEEPER_PORT, 2181);

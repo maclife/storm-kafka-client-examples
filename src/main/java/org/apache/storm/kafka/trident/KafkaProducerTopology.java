@@ -83,10 +83,10 @@ public class KafkaProducerTopology {
         };
     }
 
-    //必须使用机器名zytwork,使用localhost或IP都不行
+    //必须使用机器名zythome,使用localhost或IP都不行
     //storm 不必开启    
     public static void main(String[] args) throws Exception {
-        String brokerUrl = "zytwork:9092";
+        String brokerUrl = "zythome:9092";
 
         LocalCluster cluster = new LocalCluster();
         cluster.submitTopology("wordCounter",  new Config(), newTopology(brokerUrl, "test"));        

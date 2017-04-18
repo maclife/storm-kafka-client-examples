@@ -46,7 +46,8 @@ public class TridentKafkaClientWordCountNamedTopics {
 
     private static final String TOPIC_1 = "test";
     private static final String TOPIC_2 = "test-trident-1";
-    private static final String KAFKA_LOCAL_BROKER = "zytwork:9092";
+    private static final String KAFKA_LOCAL_BROKER = "zythome:9092";
+    private static final String zkUrl = "zythome:2181";
 
     /**
      * Core KafkaSpout only accepts an instance of SpoutConfig. <br>
@@ -154,9 +155,15 @@ public class TridentKafkaClientWordCountNamedTopics {
                     //localSubmitter.submit(topic2 + "-producer", tpConf, KafkaProducerTopology.newTopology(brokerUrl, topic2));
                     // Consumer
                     try {
-
+                        /*
                         localSubmitter.submit("topics-consumer", tpConf,
                                 TridentKafkaConsumerTopology.newTopology(localSubmitter.getDrpc(), newKafkaTridentSpoutOpaque())
+                        );
+                         */
+                        localSubmitter.submit("topics-consumer", tpConf,
+                                TridentKafkaConsumerTopology.newTopology(localSubmitter.getDrpc(),
+                                        newOpaqueTridentKafkaSpout(newTridentKafkaConfig(zkUrl, topic1))
+                                )
                         );
                         Thread.sleep(2000);
                         // print
